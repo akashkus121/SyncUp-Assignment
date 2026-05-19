@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const rawApiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const rawApiUrl = 'https://syncup-assignment-63jq.onrender.com/api';
 const trimmedApiUrl = rawApiUrl.replace(/\/$/, '');
 const API_BASE_URL = trimmedApiUrl.endsWith('/api')
   ? trimmedApiUrl
