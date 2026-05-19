@@ -18,7 +18,7 @@ const server = http.createServer(app);
 // ─── Socket.IO ────────────────────────────────────────────────────────────────
 const io = new Server(server, {
   cors: {
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
+    origin: "https://sync-up-assignment-se5o.vercel.app" || "http://localhost:3000",
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -40,7 +40,7 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
 }));
 app.use(cors({
-  origin: "https://sync-up-assignment-se5o.vercel.app/" || "http://localhost:3000",
+  origin: "https://sync-up-assignment-se5o.vercel.app" || "http://localhost:3000",
   credentials: true,
 }));
 app.use(morgan("dev"));
