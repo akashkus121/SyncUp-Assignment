@@ -311,5 +311,4 @@ ISC
 ## 👨‍💼 Support
 
 For issues or questions, please refer to the README and code comments.
-#   S y n c U p - A s s i g n m e n t  
- 
+#
