@@ -15,7 +15,7 @@ export const initSocket = () => {
     return socket;
   }
 
-  const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || 'http://localhost:5000';
+  const socketUrl = 'https://syncup-assignment-63jq.onrender.com';
 
   socket = io(socketUrl, {
     reconnection: true,
