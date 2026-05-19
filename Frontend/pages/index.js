@@ -67,9 +67,10 @@ export default function Home() {
     fetchFeeds();
   }, []);
 
-  const handleNewFeed = (callback) => {
+  // Set up real-time listeners for WebSocket events
+  useEffect(() => {
     onNewFeed((data) => {
-      console.log('📢 New feed arrived:', data);
+      console.log('📢 New feed arrived via WebSocket:', data);
       setFeeds((prev) => {
         // Check for duplicates
         const feedExists = prev.some((f) => f._id === data.feed._id);
@@ -79,17 +80,13 @@ export default function Home() {
         }
         return [data.feed, ...prev];
       });
-      callback(data);
     });
-  };
 
-  const handleDeleteFeed = (callback) => {
     onDeleteFeed((data) => {
-      console.log('📢 Feed deleted:', data);
+      console.log('📢 Feed deleted via WebSocket:', data);
       setFeeds((prev) => prev.filter((f) => f._id !== data.feedId));
-      callback(data);
     });
-  };
+  }, []);
 
   return (
     <div className={styles.page}>
@@ -135,8 +132,6 @@ export default function Home() {
 
           <FeedList
             feeds={feeds}
-            onNewFeed={handleNewFeed}
-            onDeleteFeed={handleDeleteFeed}
             loading={loading}
             error={error}
           />
