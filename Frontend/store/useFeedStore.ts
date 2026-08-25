@@ -27,10 +27,17 @@ export const useFeedStore = create<FeedState>((set, get) => ({
   },
 
   deleteFeed: (feedId: string) => {
+    const { feeds } = get();
+    const targetFeed = feeds.find((f) => f._id === feedId);
+
+    // If feed was already deleted, ignore duplicate socket/call to avoid double toast
+    if (!targetFeed) return;
+
     set((state) => ({
       feeds: state.feeds.filter((f) => f._id !== feedId),
     }));
-    get().addNotification('🗑️ A feed post was deleted', 'warning');
+
+    get().addNotification(`🗑️ Post "${targetFeed.title}" was deleted`, 'warning');
   },
 
   updateFeedLike: (feedId: string, likes: number) => {
