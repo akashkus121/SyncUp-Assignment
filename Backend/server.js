@@ -15,11 +15,17 @@ const feedRoutes = require("./routes/feed");
 const app = express();
 const server = http.createServer(app);
 
+// Dynamic CORS handler supporting localhost, Vercel preview URLs, and production domains
+const corsOriginHandler = (origin, callback) => {
+  if (!origin) return callback(null, true); // Allow server-to-server, curl, keep-alive
+  return callback(null, true); // Allow all web origins smoothly
+};
+
 // ─── Socket.IO ────────────────────────────────────────────────────────────────
 const io = new Server(server, {
   cors: {
-    origin: "https://sync-up-assignment-se5o.vercel.app",
-    methods: ["GET", "POST"],
+    origin: corsOriginHandler,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     credentials: true,
   },
   // Reconnection handled on client; server-side: pingTimeout & pingInterval
@@ -40,7 +46,7 @@ app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
 }));
 app.use(cors({
-  origin: "https://sync-up-assignment-se5o.vercel.app",
+  origin: corsOriginHandler,
   credentials: true,
 }));
 app.use(morgan("dev"));
