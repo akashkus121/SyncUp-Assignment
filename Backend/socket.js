@@ -81,7 +81,7 @@ const broadcastNewFeed = (io, feedItem) => {
 };
 
 /**
- * Broadcast a feed deletion (if needed later).
+ * Broadcast a feed deletion.
  */
 const broadcastDeleteFeed = (io, feedId) => {
   io.to(FEED_ROOM).emit("delete_feed", {
@@ -91,4 +91,17 @@ const broadcastDeleteFeed = (io, feedId) => {
   });
 };
 
-module.exports = { setupSocket, broadcastNewFeed, broadcastDeleteFeed, FEED_ROOM };
+/**
+ * Broadcast a feed like update.
+ */
+const broadcastFeedLike = (io, feedId, likes) => {
+  io.to(FEED_ROOM).emit("feed_liked", {
+    eventId: `like_${feedId}_${Date.now()}`,
+    feedId,
+    likes,
+    timestamp: new Date().toISOString(),
+  });
+};
+
+module.exports = { setupSocket, broadcastNewFeed, broadcastDeleteFeed, broadcastFeedLike, FEED_ROOM };
+

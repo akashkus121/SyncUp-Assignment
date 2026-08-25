@@ -3,7 +3,7 @@ const router = express.Router();
 
 const Feed = require("../models/Feed");
 const { cacheGet, cacheSet, cacheDel } = require("../config/redis");
-const { broadcastNewFeed } = require("../socket");
+const { broadcastNewFeed, broadcastFeedLike, broadcastDeleteFeed } = require("../socket");
 
 const FEED_CACHE_KEY = "all_feeds";
 const FEED_CACHE_TTL = 60;
@@ -220,6 +220,12 @@ router.delete("/:id", async (req, res, next) => {
     // Invalidate cache
     await cacheDel(FEED_CACHE_KEY);
 
+    // Broadcast via socket
+    const io = req.app.get("io");
+    if (io) {
+      broadcastDeleteFeed(io, id);
+    }
+
     res.json({
       success: true,
       message: "Feed deleted successfully",
@@ -231,4 +237,53 @@ router.delete("/:id", async (req, res, next) => {
   }
 });
 
+/**
+ * PATCH /api/feed/:id/like
+ * Increment likes count for a feed post
+ */
+router.patch("/:id/like", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        error: "Invalid feed ID format",
+      });
+    }
+
+    const updatedFeed = await Feed.findByIdAndUpdate(
+      id,
+      { $inc: { likes: 1 } },
+      { new: true }
+    ).select("-__v");
+
+    if (!updatedFeed) {
+      return res.status(404).json({
+        success: false,
+        error: "Feed not found",
+      });
+    }
+
+    // Clear cache
+    await cacheDel(FEED_CACHE_KEY);
+
+    // Broadcast live like count update to all clients
+    const io = req.app.get("io");
+    if (io) {
+      broadcastFeedLike(io, id, updatedFeed.likes);
+    }
+
+    res.json({
+      success: true,
+      message: "Feed liked",
+      data: updatedFeed,
+    });
+  } catch (err) {
+    console.error("PATCH /feed/:id/like error:", err.message);
+    next(err);
+  }
+});
+
 module.exports = router;
+

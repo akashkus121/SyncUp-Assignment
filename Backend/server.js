@@ -92,6 +92,17 @@ const start = async () => {
 ║  Env   : ${process.env.NODE_ENV || "development"}               ║
 ╚════════════════════════════════════╝
       `);
+
+      // Automated Keep-Alive Ping Service (runs every 4.5 mins to prevent hosting sleep)
+      const KEEP_ALIVE_INTERVAL = 4.5 * 60 * 1000;
+      setInterval(() => {
+        const url = process.env.SERVER_URL || `http://127.0.0.1:${PORT}/health`;
+        http.get(url, (res) => {
+          console.log(`💓 [Keep-Alive] Ping sent to ${url} — Status: ${res.statusCode}`);
+        }).on("error", (err) => {
+          console.warn(`⚠️ [Keep-Alive] Ping failed:`, err.message);
+        });
+      }, KEEP_ALIVE_INTERVAL);
     });
   } catch (err) {
     console.error("Fatal startup error:", err);
